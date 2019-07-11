@@ -1,0 +1,2 @@
+rm limitOnBoth.zip
+zip limitOnBoth.zip config.* *py  LICENSE *.md zipping --exclude \*~ \*zip

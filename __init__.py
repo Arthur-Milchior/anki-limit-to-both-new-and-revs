@@ -11,6 +11,7 @@ currentSync = False
 def counts(self, card=None):
         """The three numbers to show in anki deck's list/footer.
         Number of new cards, learning repetition, review card.
+        Also the total sum, if not during sync. #NEW
 
         If cards, then the tuple takes into account the card.
         sync -- whether it's called from sync, and the return must satisfies sync sanity check
@@ -25,7 +26,7 @@ def counts(self, card=None):
         cur = self.col.decks.current()
         conf = self.col.decks.confForDid(cur['id'])
         if not currentSync:
-            today = conf['perDay'] - cur['revToday'][1] - cur['newToday'][1]
+            today = conf.get('perDay',1000) - cur['revToday'][1] - cur['newToday'][1]
             counts.append(today)
         return tuple(counts)
 s1.counts = counts
@@ -133,9 +134,10 @@ s2._deckRevLimitSingle = _deckRevLimitSingle
 from anki.sync import *
 oldSanityCheck = Syncer.sanityCheck
 def sanityCheck(self):
-    currentSync = True
-    oldSanityCheck(self)
-    currentSync = False
+        global currentSync
+        currentSync = True
+        oldSanityCheck(self)
+        currentSync = False
 
 Syncer.sanityCheck = sanityCheck
 
